@@ -115,6 +115,10 @@ def verify_chain():
             return False
     return True
 
+def verify_transactions():
+    """Verifies all open transactions."""
+    return all([verify_transaction(tx) for tx in open_transactions])
+
 waiting_for_input = True
 
 while waiting_for_input:
@@ -122,6 +126,7 @@ while waiting_for_input:
     print('2. Mine a new block')
     print('3. Print the blocks of blockchain')
     print('4. Output Participants')
+    print('5. Verify the transactions')
     print('h. Hack the blockchain')
     print('q. To exit')
     
@@ -147,6 +152,12 @@ while waiting_for_input:
 
     elif user_input == '4':
         print(participants)
+
+    elif user_input == '5':
+        if verify_transactions():
+            print('All transactions are valid')
+        else:
+            print('There are invalid transactions')
     
     elif user_input == 'h':
         if len(blockchain) >= 1:
@@ -167,7 +178,7 @@ while waiting_for_input:
         print('Invalid Blockchain!')
         #Break out of loop
         break
-    print(get_balance('John Doe'))
+    print('Balance of {} is {:6.8f}'.format('John Doe',get_balance('John Doe')))
 else:
     print('User left!')
 
