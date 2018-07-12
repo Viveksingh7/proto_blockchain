@@ -1,5 +1,6 @@
 #Initialzing empty blockchain lists
 MINING_REWARD = 10
+
 genesis_block = {
         'previous_hash': '',
         'index':0,
@@ -16,18 +17,20 @@ def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
 
 
-def get_balances(participant):
-    tx_sender = [[tx['amount'] for tx in block['transactions']if tx['sender'] == participant] for block in blockchain]
+def get_balance(participant):
+    tx_sender = [[tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
+    open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant]
+    tx_sender.append(open_tx_sender)
     amount_sent = 0
     for tx in tx_sender:
         if len(tx)>0:
             amount_sent +=tx[0]
-    tx_recipient = [[tx['amount'] for tx in block['transactions']if tx['recipient'] == participant] for block in blockchain]
+    tx_recipient = [[tx['amount'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
     amount_recieved = 0
     for tx in tx_recipient:
         if len(tx)>0:
             amount_recieved +=tx[0]
-    return amount_recieved-amount_sent
+    return amount_recieved - amount_sent
 
 
 
@@ -67,11 +70,12 @@ def mine_block():
         'recepient' : owner,
         'amount' : MINING_REWARD
     }
+
     open_transactions.append(reward_transaction)
 
     block = {
         'previous_hash': hashed_block,
-        'index':len(blockchain),
+        'index': len(blockchain),
         'transactions':open_transactions
     }
     blockchain.append(block)
@@ -86,25 +90,33 @@ def get_transaction_value():
 
 def verify_transaction(transaction):
     sender_balance = get_balance(transaction['sender'])
+    return sender_balance >= transaction['amount']
 
 
 def get_user_input():
-    return input()
+    user_input = input('Your choice: ')
+    return user_input
 
+def print_blockchain_elements():
+    """Output all the blocks of the blockchain"""
+    for block in blockchain:
+        print('Outputting Block!')
+        print(block)
+    else:
+        print('-' * 20)
 
-def verify_chain(blockchain):
+def verify_chain():
     """Loops through the chain to check it's verification"""
     for (index,block) in enumerate(blockchain):
         if index==0:
             continue
         if block['previous_hash'] != hash_block(blockchain[index-1]):
-            return "Problem in the hashing"
-    return "No problem verfied chain"
+            return False
+    return True
 
-loop_input = True
+waiting_for_input = True
 
-while loop_input:
-    "Choices"
+while waiting_for_input:
     print('1. Input into blockchain')
     print('2. Mine a new block')
     print('3. Print the blocks of blockchain')
@@ -119,18 +131,19 @@ while loop_input:
     if user_input == '1':
         tx_data = get_transaction_value()
         recipient,amount = tx_data
-        add_transaction(recipient,amount=amount)
-        print(open_transactions)
-    
+        #Adding the transaction amount to blockchain
+        if add_transaction(recipient,amount=amount):
+            print('Added transaction!')
+        else :
+            print('Transaction Failed!')
+
     elif user_input == '2':
         if mine_block():
             open_transactions = []
 
-    
     elif user_input == '3':
-        for block in blockchain:
-            print(block)
-    
+        print_blockchain_elements()
+
     elif user_input == '4':
         print(participants)
     
@@ -143,12 +156,20 @@ while loop_input:
     }
     
     elif user_input == 'q':
-        loop_input = False
+        waiting_for_input = False
     
     else:
-        print('Wrong choice man')
+        print('Invalid was invalid,please pick a given option')
 
-print(get_balances('John Doe'))
-print(verify_chain(blockchain))
+    if not verify_chain():
+        print_blockchain_elements()
+        print('Invalid Blockchain!')
+        #Break out of loop
+        break
+    print(get_balance('John Doe'))
+else:
+    print('User left!')
+
+print('Done!')
 
 
