@@ -32,3 +32,5 @@ __This repository is dedicated to the concepts of blockchain using python. Since
 ><u>__Added the string formatter:__</u>:
 Added it to calculate the balance check upto 10th place of currency. Since it's the most logical thing to do as the value of cryptos are taken seriously in decimals unlike conventional currencies. 
 
+
+Testing a new thing.
