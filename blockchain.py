@@ -12,13 +12,16 @@ owner = 'John Doe' #dummy value (real will be in hash dkfkjsoij3oij4iosjd3)
 participants = {'John Doe'}       #Initializing a set
 
 
-
 def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
 
 
 def get_balance(participant):
+      # Fetch a list of all sent coin amounts for the given person (empty lists are returned if the person was NOT the sender)
+    # This fetches sent amounts of transactions that were already included in blocks of the blockchain
     tx_sender = [[tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
+    # Fetch a list of all sent coin amounts for the given person (empty lists are returned if the person was NOT the sender)
+    # This fetches sent amounts of open transactions (to avoid double spending)
     open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant]
     tx_sender.append(open_tx_sender)
     amount_sent = 0
@@ -26,7 +29,7 @@ def get_balance(participant):
         if len(tx)>0:
             amount_sent +=tx[0]
     tx_recipient = [[tx['amount'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
-    amount_recieved = 0
+    amount_recieved = 0 
     for tx in tx_recipient:
         if len(tx)>0:
             amount_recieved +=tx[0]
@@ -38,9 +41,7 @@ def get_last_blockchain_value():
     """Returns the value of last element of blockchain"""
     if len(blockchain) < 1:
         return None
-    else:
-        return blockchain[-1]
-
+    return blockchain[-1]
 
 def add_transaction(recipient,sender=owner, amount = 1.0):
     """Appends the last value and new value to the open_transaction blockchain
@@ -67,7 +68,7 @@ def mine_block():
 
     reward_transaction = {
         'sender' : 'MINING',
-        'recepient' : owner,
+        'recipient' : owner,
         'amount' : MINING_REWARD
     }
 
