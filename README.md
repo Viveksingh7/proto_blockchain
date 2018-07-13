@@ -27,3 +27,9 @@ A hash function is any function that can be used to map data of arbitrary size t
 ><u>__Proof of Work:__</u>
 Added the proof of work system, heavy computation(theoritically) to check the authenticity of the blocks.
 
+Minor Tweaks:
+>Removed the usage of dictionary
+>>Added the   __orderedDict__  such that their is not even a single chance of altering of arguments passed. Sometimes to optimize run time, python tweaks the things a little bit and their is slight possiblity that the dict pair gets altered while passing since their are not ordered in any way.
+
+><u>__Small entitites:__</u>
+Seprated the hash as hash.py. Objective is to effectively break the complete file into small entitites.

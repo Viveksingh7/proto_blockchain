@@ -2,10 +2,11 @@ import functools
 """for reduce"""
 import hashlib as hl
 """for hashing"""
-import json
-"""for string conversion"""
 from collections import OrderedDict
 """for ordering of Dictionaries"""
+import json
+
+from hash_util import hash_block,hash_string_256
 
 #Initialzing empty blockchain lists
 MINING_REWARD = 10
@@ -21,13 +22,23 @@ open_transactions = []
 owner = 'John Doe' #dummy value (real will be in hash dkfkjsoij3oij4iosjd3)  
 participants = {'John Doe'}       #Initializing a set
 
+def load_data():
+    with open('blockchain.txt',mode='r') as f:
+        file_content = f.readlines()
+        global blockchain
+        global open_transactions
+        blockchain = file_content[0]
+        open_transactions = file_content[1]
+
+#load_data()
 
 
+def save_data():
+    with open('blockchain.txt',mode='w') as f:
+        f.write(json.dumps(blockchain))
+        f.write('\n')
+        f.write(json.dumps(open_transactions))
 
-def hash_block(block):
-    return hl.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
-
- 
 def valid_proof(transactions,last_hash,proof):
     guess = (str(transactions)+str(last_hash)+str(proof)).encode()
     guess_hash = hl.sha256(guess).hexdigest()
@@ -75,20 +86,16 @@ def add_transaction(recipient,sender=owner, amount = 1.0):
     sender : Sender of the coins by defualt owner
     recipient: Receiver of the coins
     amount: Amount you want to transact 1.0 by default"""
-    
-    
-    #transaction = {
-     #   'sender':sender, 
-      #  'recipient':recipient, 
-       # 'amount':amount
-    #}
+
     transaction = OrderedDict([('sender',sender),('recipient',recipient),('amount',amount)])
 
-
-    open_transactions.append(transaction)
-    participants.add(sender)                                #Adding it to list of participants
-    participants.add(recipient)                             #Adding it to list of participants
-
+    if verify_transaction(transaction):
+        open_transactions.append(transaction)
+        participants.add(sender)                                #Adding it to list of participants
+        participants.add(recipient)  
+        save_data()                           #Adding it to list of participants
+        return True
+    return False
 
 def mine_block():
     last_block = blockchain[-1]
@@ -113,6 +120,7 @@ def mine_block():
         'proof' : proof
     }
     blockchain.append(block)
+    save_data()
     return True
 
 
