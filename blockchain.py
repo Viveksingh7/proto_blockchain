@@ -23,14 +23,50 @@ owner = 'John Doe' #dummy value (real will be in hash dkfkjsoij3oij4iosjd3)
 participants = {'John Doe'}       #Initializing a set
 
 def load_data():
-    with open('blockchain.txt',mode='r') as f:
-        file_content = f.readlines()
-        global blockchain
-        global open_transactions
-        blockchain = file_content[0]
-        open_transactions = file_content[1]
+    try:
+     with open('blockchain.txt', mode='r') as f:
+            # file_content = pickle.loads(f.read())
+            file_content = f.readlines()
+            # blockchain = file_content['chain']
+            # open_transactions = file_content['ot']
+            blockchain = json.loads(file_content[0][:-1])
+            # We need to convert  the loaded data because Transactions should use OrderedDict
+            updated_blockchain = []
+            for block in blockchain:
+                updated_block = {
+                    'previous_hash': block['previous_hash'],
+                    'index': block['index'],
+                    'proof': block['proof'],
+                    'transactions': [OrderedDict(
+                        [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) for tx in block['transactions']]
+                }
+                updated_blockchain.append(updated_block)
+            blockchain = updated_blockchain
+            open_transactions = json.loads(file_content[1])
+            # We need to convert  the loaded data because Transactions should use OrderedDict
+            updated_transactions = []
+            for tx in open_transactions:
+                updated_transaction = OrderedDict(
+                    [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])])
+                updated_transactions.append(updated_transaction)
+            open_transactions = updated_transactions
+    except IOError:
+        # Our starting block for the blockchain
+        genesis_block = {
+            'previous_hash': '',
+            'index': 0,
+            'transactions': [],
+            'proof': 100
+        }
+        # Initializing our (empty) blockchain list
+        blockchain = [genesis_block]
+        # Unhandled transactions
+        open_transactions = []
+    finally:
+        print('Cleanup!')
 
-#load_data()
+
+load_data()
 
 
 def save_data():
@@ -63,16 +99,12 @@ def get_balance(participant):
     """Fetch a list of all sent coin amounts for the given person (empty lists are returned if the person was NOT the sender)"""
     """This fetches sent amounts of open transactions (to avoid double spending)"""
     
-    open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant]
-     
+    open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant] 
     tx_sender.append(open_tx_sender)
-
     amount_sent = functools.reduce(lambda tx_sum,tx_amt : tx_sum +sum(tx_amt) if len(tx_amt)>0 else tx_sum+0, tx_sender,0) 
     
     tx_recipient = [[tx['amount'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
-    
     amount_recieved = functools.reduce(lambda tx_sum,tx_amt : tx_sum +sum(tx_amt) if len(tx_amt)>0 else tx_sum+0, tx_recipient,0) 
-    
     return amount_recieved - amount_sent
 
 def get_last_blockchain_value():
@@ -106,13 +138,6 @@ def mine_block():
     hashed_block = hash_block(last_block)
     proof = proof_of_work()
 
-
-    #reward_transaction = {
-    #    'sender' : 'MINING',
-    #    'recipient' : owner,
-    #    'amount' : MINING_REWARD
-    #}
-
     reward_transaction = OrderedDict([('sender','MINING',),('recipient',owner),('amount',MINING_REWARD)])
 
     open_transactions.append(reward_transaction)
@@ -123,6 +148,7 @@ def mine_block():
         'transactions':open_transactions,
         'proof' : proof
     }
+
     blockchain.append(block)
     save_data()
     return True
