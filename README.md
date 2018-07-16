@@ -1,6 +1,15 @@
 # proto_blockchain
 
 __This repository is dedicated to the concepts of blockchain using python. Since python is one of the most abundant language for programming right now. Hereby I am creating a repo and initializing it with basic concepts for now.__
+
+__Right now this program can perform various checks and functions:__
+
+```
+1. You can mine block which credits to your wallet.
+2. You can do transactions which is cross verified so that you cannot make false cases.
+3. Hashing is used to prevent tampering with the already creating transactions.
+4. There are many minute details I leave for the observers. Have a look Good day!
+```
   
 ## <u>Updates and fixes :</u>
 
