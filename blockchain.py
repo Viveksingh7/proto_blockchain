@@ -1,34 +1,25 @@
 import functools 
-"""for reduce"""
-import hashlib as hl
-"""for hashing"""
+import hashlib 
 from collections import OrderedDict
-"""for ordering of Dictionaries"""
 import json
-
 from hash_util import hash_block,hash_string_256
 
 #Initialzing empty blockchain lists
 MINING_REWARD = 10
 
-genesis_block = {
-        'previous_hash': '',
-        'index':0,
-        'transactions':[],
-        'proof':100
-    }
-blockchain = [genesis_block]
+blockchain = []
+# Unhandled transactions
 open_transactions = []
 owner = 'John Doe' #dummy value (real will be in hash dkfkjsoij3oij4iosjd3)  
+# Registered participants: Ourself + other people sending/ receiving coins
 participants = {'John Doe'}       #Initializing a set
 
 def load_data():
+    global blockchain
+    global open_transactions
     try:
-     with open('blockchain.txt', mode='r') as f:
-            # file_content = pickle.loads(f.read())
+        with open('blockchain.txt', mode='r') as f:
             file_content = f.readlines()
-            # blockchain = file_content['chain']
-            # open_transactions = file_content['ot']
             blockchain = json.loads(file_content[0][:-1])
             # We need to convert  the loaded data because Transactions should use OrderedDict
             updated_blockchain = []
@@ -65,20 +56,21 @@ def load_data():
     finally:
         print('Cleanup!')
 
-
 load_data()
 
 
 def save_data():
-    with open('blockchain.txt',mode='w') as f:
-        f.write(json.dumps(blockchain))
-        f.write('\n')
-        f.write(json.dumps(open_transactions))
+    try:
+        with open('blockchain.txt',mode='w') as f:
+            f.write(json.dumps(blockchain))
+            f.write('\n')
+            f.write(json.dumps(open_transactions))
+    except IOError:
+        print('Saving failed!')
 
 def valid_proof(transactions,last_hash,proof):
     guess = (str(transactions)+str(last_hash)+str(proof)).encode()
-    guess_hash = hl.sha256(guess).hexdigest()
-    print(guess_hash)
+    guess_hash = hash_string_256(guess)
     return guess_hash[0:2] == '00'
 
 def proof_of_work():
@@ -86,7 +78,7 @@ def proof_of_work():
     last_hash = hash_block(last_block)
     proof = 0
     while not valid_proof(open_transactions, last_hash, proof):
-        proof+=1
+        proof += 1
     return proof
 
 
@@ -138,19 +130,19 @@ def mine_block():
     hashed_block = hash_block(last_block)
     proof = proof_of_work()
 
-    reward_transaction = OrderedDict([('sender','MINING',),('recipient',owner),('amount',MINING_REWARD)])
-
-    open_transactions.append(reward_transaction)
-
+    reward_transaction = OrderedDict(
+        [('sender','MINING'), ('recipient',owner), ('amount', MINING_REWARD)])
+    # Copy transaction instead of manipulating the original open_transactions list
+    # This ensures that if for some reason the mining should fail, we don't have the reward transaction stored in the open transactions
+    copied_transactions = open_transactions[:]
+    copied_transactions.append(reward_transaction)
     block = {
         'previous_hash': hashed_block,
         'index': len(blockchain),
-        'transactions':open_transactions,
-        'proof' : proof
+        'transactions': copied_transactions,
+        'proof': proof
     }
-
     blockchain.append(block)
-    save_data()
     return True
 
 
@@ -216,10 +208,12 @@ while waiting_for_input:
             print('Added transaction!')
         else :
             print('Transaction Failed!')
+        print(open_transactions)
 
     elif user_input == '2':
         if mine_block():
             open_transactions = []
+        save_data()
 
     elif user_input == '3':
         print_blockchain_elements()

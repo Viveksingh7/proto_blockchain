@@ -5,7 +5,7 @@ import json
 
 
 def hash_string_256(string):
-    return hl.sha256(string).digest()
+    return hl.sha256(string).hexdigest()
 
 def hash_block(block):
     """Arguments:

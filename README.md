@@ -33,3 +33,17 @@ Minor Tweaks:
 
 ><u>__Small entitites:__</u>
 Seprated the hash as hash.py. Objective is to effectively break the complete file into small entitites.
+
+### Update 2.0:
+
+><u>__Fixed Problems with the hashing:__</u>
+The hashing was being shown invalid due to faulty parsing.
+
+><u>__Fixed Genesis Block Dependency:__</u>
+Fixed the loading problem with the genesis block and the sidwise open_transactions. Function load_data lead to error as initially there was no record to maintain.
+
+><u>__Change the digest to `hexdigest` in hashlib:__</u>
+Looping over hexdigest was taking infinite time(I waited for atleast 19 minutes) so changing it to hexdigest was a better option since the first two digits were compared.
+
+
+><u>__'Fixed the `genesis block problem`:__</u>
