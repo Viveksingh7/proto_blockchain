@@ -2,18 +2,10 @@
 
 __This repository is dedicated to the concepts of blockchain using python. Since python is one of the most abundant language for programming right now. Hereby I am creating a repo and initializing it with basic concepts for now.__
 
-__Right now this program can perform various checks and functions:__
 
-```
-1. You can mine block which credits to your wallet.
-2. You can do transactions which is cross verified so that you cannot make false cases.
-3. Hashing is used to prevent tampering with the already creating transactions.
-4. There are many minute details I leave for the observers. Have a look Good day!
-```
-  
-## <u>Updates and fixes :</u>
+## __<u>Updates and fixes :</u>__
 
-### Update 1.1 :
+### __Update 1.1:__
 
 ><u>__Fixed the mine_block function__</u>
 : Error was due to the usage of different spelling for the key "recipient". Due to that the already created chain was not being verified hence no adding of new block.
@@ -28,7 +20,7 @@ Added the lambda function to reduce the looping through big chains of transactio
 Added reduce function to further reduce the calculation time.
 
 
-### Update 1.2 :
+### __Update 1.2:__
 
 ><u>__SHA-256__</u>:
 A hash function is any function that can be used to map data of arbitrary size to data of fixed size¹. Added SHA-256 for the encryption technique previously we were using the basic hashing of our own.
@@ -43,7 +35,7 @@ Minor Tweaks:
 ><u>__Small entitites:__</u>
 Seprated the hash as hash.py. Objective is to effectively break the complete file into small entitites.
 
-### Update 2.0:
+### __Update 2.0:__
 
 ><u>__Fixed Problems with the hashing:__</u>
 The hashing was being shown invalid due to faulty parsing.
@@ -56,3 +48,23 @@ Looping over hexdigest was taking infinite time(I waited for atleast 19 minutes)
 
 
 ><u>__'Fixed the `genesis block problem`:__</u>
+
+
+### __Update 3.0:__
+
+> <u>__Replaced the procedural with object oriented programming:__</u>
+Now all the properties of the block are windup under a ```Class Block```.
+
+> <u>__Fixed the JSON serialization problem:__</u>
+Some specific objects are json serializable, hence the Class ```Block``` is not serialized by default.
+
+```text
+JSON works with the inbuilt datatypes so by using the __dict__ we can convert to the dictionary type from the default class type
+```
+
+```text
+The reason to use the copy function is that if we directly apply changes to the blocks of blockchain. Hashing of the previous block stored for the previous transactions can change in serialization. Since to save it from changing another copy is made.
+```
+
+> <u>
+
