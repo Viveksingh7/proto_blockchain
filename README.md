@@ -58,13 +58,13 @@ Now all the properties of the block are windup under a ```Class Block```.
 > <u>__Fixed the JSON serialization problem:__</u>
 Some specific objects are json serializable, hence the Class ```Block``` is not serialized by default.
 
-```text
-JSON works with the inbuilt datatypes so by using the __dict__ we can convert to the dictionary type from the default class type
-```
+> <u>__JSON works with the inbuilt datatypes</u> so by using the __dict__ we can convert to the dictionary type from the default class type__
 
-```text
-The reason to use the copy function is that if we directly apply changes to the blocks of blockchain. Hashing of the previous block stored for the previous transactions can change in serialization. Since to save it from changing another copy is made.
-```
+> __<u>The reason to use the copy function is that </u> if we directly apply changes to the blocks of blockchain. Hashing of the previous block stored for the previous transactions can change in serialization. Since to save it from changing another copy is made.__
 
-> <u>
+><u> __Added the verification class:__ </u>Seprated the verification functions under other class. Improved code readablity and reusage.
 
+><u> __Added the node class:__ </u>Added the node class which wil act as user interface. Other classes such as blockchain, verification, printable and transaction are added on the basis of functionality.
+
+><u>__Implemented more secure channel between classes and assigned random id function i.e. uuid4 to the sender:__</u> 
+ 
