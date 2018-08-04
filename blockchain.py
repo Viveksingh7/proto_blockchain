@@ -7,6 +7,7 @@ from utility.hash_util import hash_block
 from utility.verification import Verification
 from block import Block
 from transaction import Transaction
+from wallet import Wallet
 
 #Initialzing empty blockchain lists
 MINING_REWARD = 10
@@ -38,7 +39,7 @@ class Blockchain:
                 # We need to convert  the loaded data because Transactions should use OrderedDict
                 updated_blockchain = []
                 for block in blockchain:
-                    converted_tx = [Transaction(tx['sender'],tx['recipient'],tx['amount']) for tx in block['transactions']]
+                    converted_tx = [Transaction(tx['sender'],tx['recipient'],tx['signature'],tx['amount']) for tx in block['transactions']]
                 
                     updated_block = Block(block['index'],block['previous_hash'], converted_tx, block['proof'], block['timestamp'])
                     updated_blockchain.append(updated_block)
@@ -48,7 +49,7 @@ class Blockchain:
                 # We need to convert  the loaded data because Transactions should use OrderedDict
                 updated_transactions = []
                 for tx in open_transactions:
-                    updated_transaction = Transaction(tx['sender'],tx['recipient'],tx['amount'])
+                    updated_transaction = Transaction(tx['sender'],tx['recipient'],tx['signature'],tx['amount'])
 
                     updated_transactions.append(updated_transaction)
                 self.__open_transactions = updated_transactions
@@ -106,11 +107,11 @@ class Blockchain:
             return None
         return self.__chain[-1]
 
-    def add_transaction(self,recipient,sender, amount = 1.0):
+    def add_transaction(self,recipient,sender, signature, amount = 1.0):
         if self.hosting_node == None:
             return False
 
-        transaction = Transaction(sender,recipient,amount)
+        transaction = Transaction(sender,recipient,signature,amount)
 
         if Verification.verify_transaction(transaction, self.get_balance):
             self.__open_transactions.append(transaction)
@@ -125,16 +126,19 @@ class Blockchain:
         hashed_block = hash_block(last_block)
         proof = self.proof_of_work()
 
-        reward_transaction = Transaction('MINING', self.hosting_node, MINING_REWARD)
+        reward_transaction = Transaction('MINING', self.hosting_node,'', MINING_REWARD)
         
 
         # Copy transaction instead of manipulating the original open_transactions list
         # This ensures that if for some reason the mining should fail, we don't have the reward transaction stored in the open transactions
         
         copied_transactions = self.__open_transactions[:]
+        for tx in copied_transactions:
+            if not Wallet.verify_transaction(tx):
+                return False
         copied_transactions.append(reward_transaction)
 
-        block = Block(len(self.__chain),hashed_block,copied_transactions,proof,)
+        block = Block(len(self.__chain),hashed_block,copied_transactions,proof)
     
         self.__chain.append(block)
         self.__open_transactions = []

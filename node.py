@@ -8,8 +8,8 @@ class Node:
     def __init__(self):
         #self.wallet.public_key = str(uuid4())
         self.wallet = Wallet()
-        self.blockchain = None
-
+        self.wallet.create_keys()
+        self.blockchain = Blockchain(self.wallet.public_key) 
     def get_transaction_value(self):
         """Takes input of a new transaction and returns recipient and amount"""
         tx_recipient = input('Enter the recipient of the transaction:')
@@ -38,6 +38,7 @@ class Node:
             print('4. Verify the transactions')
             print('5. Create Wallet')
             print('6. Load Wallet')
+            print('7. Save Keys')
             print('q. To exit')
             
             user_input = self.get_user_input()
@@ -48,7 +49,8 @@ class Node:
                 tx_data = self.get_transaction_value()
                 recipient,amount = tx_data
                 #Adding the transaction amount to blockchain
-                if self.blockchain.add_transaction(recipient, self.wallet.public_key, amount=amount):
+                signature = self.wallet.sign_transaction(self.wallet.public_key, recipient, amount)
+                if self.blockchain.add_transaction(recipient, self.wallet.public_key, signature,amount=amount):
                     print('Added transaction!')
                 else :
                     print('Transaction Failed!')
@@ -70,8 +72,14 @@ class Node:
             elif user_input == '5':
                 self.wallet.create_keys()
                 self.blockchain = Blockchain(self.wallet.public_key) 
+
             elif user_input == '6': 
-                pass
+                self.wallet.load_keys()
+                self.blockchain = Blockchain(self.wallet.public_key) 
+
+            elif user_input =='7':
+                self.wallet.save_keys()
+
             elif user_input == 'q':
                 waiting_for_input = False
             
