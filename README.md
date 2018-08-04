@@ -66,5 +66,17 @@ Some specific objects are json serializable, hence the Class ```Block``` is not 
 
 ><u> __Added the node class:__ </u>Added the node class which wil act as user interface. Other classes such as blockchain, verification, printable and transaction are added on the basis of functionality.
 
-><u>__Implemented more secure channel between classes and assigned random id function i.e. uuid4 to the sender:__</u> 
+><u>__Implemented more secure channel between classes and assigned random id function i.e. uuid4 to the sender:__</u>
+
+><u> __Removed the problem with the last transaction. It was open to manipulation. The last block was pushed when another block was created after it. So to prevent the exploitation following things were used:__</u>
+
+```text
+Imported python package called pycryto
+
+
+Using RSA public key private key pair
+
+RSA public-key cryptography algorithm (signature and encryption).
+
+RSA is the most widespread and used public key algorithm. Its security is based on the difficulty of factoring large integers. The algorithm has withstood attacks for 30 years, and it is therefore considered reasonably secure for new designs.
  

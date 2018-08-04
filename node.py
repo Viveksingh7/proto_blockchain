@@ -1,13 +1,14 @@
 from uuid import uuid4
 from blockchain import Blockchain
 from utility.verification import Verification
+from wallet import Wallet
 
 
 class Node:
     def __init__(self):
-        #self.id = str(uuid4())
-        self.id = 'John Doe'
-        self.blockchain = Blockchain(self.id) 
+        #self.wallet.public_key = str(uuid4())
+        self.wallet = Wallet()
+        self.blockchain = None
 
     def get_transaction_value(self):
         """Takes input of a new transaction and returns recipient and amount"""
@@ -35,6 +36,8 @@ class Node:
             print('2. Mine a new block')
             print('3. Output the blocks of blockchain')
             print('4. Verify the transactions')
+            print('5. Create Wallet')
+            print('6. Load Wallet')
             print('q. To exit')
             
             user_input = self.get_user_input()
@@ -45,14 +48,15 @@ class Node:
                 tx_data = self.get_transaction_value()
                 recipient,amount = tx_data
                 #Adding the transaction amount to blockchain
-                if self.blockchain.add_transaction(recipient, self.id, amount=amount):
+                if self.blockchain.add_transaction(recipient, self.wallet.public_key, amount=amount):
                     print('Added transaction!')
                 else :
                     print('Transaction Failed!')
                 print(self.blockchain.get_open_transactions())
 
             elif user_input == '2':
-                self.blockchain.mine_block()
+                if not self.blockchain.mine_block():
+                    print('Block Mining Failed, Got no Wallet?')
                     
             elif user_input == '3':
                 self.print_blockchain_elements()
@@ -63,6 +67,11 @@ class Node:
                 else:
                     print('There are invalid transactions')
             
+            elif user_input == '5':
+                self.wallet.create_keys()
+                self.blockchain = Blockchain(self.wallet.public_key) 
+            elif user_input == '6': 
+                pass
             elif user_input == 'q':
                 waiting_for_input = False
             
@@ -74,7 +83,7 @@ class Node:
                 print('Invalid Blockchain!')
                 #Break out of loop
                 break
-            print('Balance of {} is {:6.8f}'.format(self.id, self.blockchain.get_balance()))
+            print('Balance of {} is {:6.8f}'.format(self.wallet.public_key, self.blockchain.get_balance()))
         else:
             print('User left!')
 

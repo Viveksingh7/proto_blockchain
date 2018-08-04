@@ -107,14 +107,8 @@ class Blockchain:
         return self.__chain[-1]
 
     def add_transaction(self,recipient,sender, amount = 1.0):
-        """Appends the last value and new value to the open_transaction blockchain
-        
-        Add sender and recipient to the list of participants
-
-        Arguments:
-        sender : Sender of the coins by defualt owner
-        recipient: Receiver of the coins
-        amount: Amount you want to transact 1.0 by default"""
+        if self.hosting_node == None:
+            return False
 
         transaction = Transaction(sender,recipient,amount)
 
@@ -125,6 +119,8 @@ class Blockchain:
         return False
 
     def mine_block(self):
+        if self.hosting_node == None:
+            return False
         last_block = self.__chain[-1]
         hashed_block = hash_block(last_block)
         proof = self.proof_of_work()
