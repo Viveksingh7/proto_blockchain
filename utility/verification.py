@@ -32,7 +32,7 @@ class Verification:
     @classmethod
     def verify_transactions(cls, open_transactions, get_balance):
         """Verifies all open transactions."""
-        return all([cls.verify_transaction(tx,get_balance, False) for tx in open_transactions])
+        return all([cls.verify_transaction(tx, get_balance, False) for tx in open_transactions])
 
     @staticmethod
     def valid_proof(transactions,last_hash,proof):

@@ -79,4 +79,14 @@ Using RSA public key private key pair
 RSA public-key cryptography algorithm (signature and encryption).
 
 RSA is the most widespread and used public key algorithm. Its security is based on the difficulty of factoring large integers. The algorithm has withstood attacks for 30 years, and it is therefore considered reasonably secure for new designs.
- 
+```
+
+### __Update 3.1:__
+><u>__Updated the Verification Logics__</u>
+Added the logic to check the open_transaction for credit limit.
+
+><u>__Added the create and load wallet feature__</u>
+Added the feature which on use loads the existing key value pair.
+
+---
+
